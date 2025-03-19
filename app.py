@@ -11,8 +11,14 @@ def home():
 def html_visioncine():
     url = "https://visioncine-1.com.br/movies"  # URL do Visioncine (ajuste conforme necessário)
 
+    # Cabeçalhos que simulam uma requisição de um navegador
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+
     try:
-        response = requests.get(url, timeout=10)
+        # Requisição com cabeçalhos personalizados
+        response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()  # Levanta um erro se a resposta for inválida (status diferente de 200)
 
         # Retorna o conteúdo HTML da página
