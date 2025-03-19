@@ -20,13 +20,31 @@ API_KEYS = {
     "0a9f1e3b-7c2d-4d8a-bf23-6d5e9a8c4f12": "Usuário 1"
 }
 
+# Headers personalizados para simular um navegador
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+    "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Connection": "keep-alive",
+    "Referer": "https://www.google.com/",
+}
+
+# Cookies personalizados (se necessário)
+COOKIES = {
+    "session_id": "seu_session_id_aqui",  # Substitua por um cookie válido, se necessário
+    "language": "pt-BR",
+}
+
 # Função para carregar os filmes ao iniciar o servidor
 def carregar_filmes():
     global filmes_globais
     url = "https://visioncine-1.com.br/movies"
     try:
         logger.info("Iniciando carregamento dos filmes...")
-        response = requests.get(url, timeout=10)  # Timeout de 10 segundos
+        
+        # Fazendo a requisição com headers e cookies
+        response = requests.get(url, headers=HEADERS, cookies=COOKIES, timeout=10)
         response.encoding = 'utf-8'
 
         if response.status_code != 200:
@@ -119,7 +137,7 @@ def pegar_detalhes_do_filme(filme_id, filmes_info):
 
     try:
         logger.info(f"Fazendo requisição para a página de detalhes: {url_filme}")
-        response = requests.get(url_filme, timeout=10)
+        response = requests.get(url_filme, headers=HEADERS, cookies=COOKIES, timeout=10)
         response.encoding = 'utf-8'
 
         if response.status_code != 200:
@@ -166,7 +184,7 @@ def pegar_detalhes_do_filme(filme_id, filmes_info):
         # Segunda requisição: página do player
         if link_assistir != "Link de assistir não disponível":
             logger.info(f"Fazendo requisição para a página do player: {link_assistir}")
-            response_player = requests.get(link_assistir, timeout=10)
+            response_player = requests.get(link_assistir, headers=HEADERS, cookies=COOKIES, timeout=10)
             response_player.encoding = 'utf-8'
 
             if response_player.status_code != 200:
