@@ -3,7 +3,6 @@ import requests
 from bs4 import BeautifulSoup
 import html
 import json
-import re
 
 app = Flask(__name__)
 
@@ -23,6 +22,9 @@ def carregar_filmes():
 
     soup = BeautifulSoup(response.content, "html.parser")
     filmes = soup.find_all("div", class_="swiper-slide item poster")
+
+    # Limpa a lista antes de adicionar novos filmes
+    filmes_globais.clear()
 
     for filme in filmes:
         titulo_tag = filme.find("h6")
@@ -47,10 +49,12 @@ def carregar_filmes():
 
     print(f"Carregados {len(filmes_globais)} filmes.")
 
+# Carregar filmes ao iniciar o servidor
+carregar_filmes()
+
 # Função para carregar filmes ao acessar a raiz
 @app.route("/", methods=["GET"])
 def index():
-    carregar_filmes()  # Carregar os filmes ao acessar essa rota
     return jsonify(filmes_globais)
 
 # Rota para pegar todos os filmes
