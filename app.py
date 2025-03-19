@@ -1,12 +1,11 @@
 import aiohttp
-import asyncio
-from flask import Flask, Response
+from quart import Quart, Response
 
-app = Flask(__name__)
+app = Quart(__name__)
 
 @app.route('/')
-def home():
-    return "Bem-vindo à API Visioncine!"
+async def home():
+    return "Bem-vindo à API sVisioncine!"
 
 @app.route('/html-visioncine')
 async def html_visioncine():
