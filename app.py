@@ -51,7 +51,7 @@ def carregar_filmes():
 @app.route("/", methods=["GET"])
 def index():
     carregar_filmes()  # Carregar os filmes ao acessar essa rota
-    return jsonify({"message": "Filmes carregados com sucesso!"})
+    return jsonify(filmes_globais)
 
 # Rota para pegar todos os filmes
 @app.route("/filmes", methods=["GET"])
