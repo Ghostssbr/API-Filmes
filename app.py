@@ -1,18 +1,16 @@
+import aiohttp
+import asyncio
 from flask import Flask, Response
-import requests
 
 app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "Bem-vindo à API cine!"
+    return "Bem-vindo à API Visioncine!"
 
 @app.route('/html-visioncine')
-def html_visioncine():
+async def html_visioncine():
     url = "https://visioncine-1.com.br/movies"
-
-    # Usar uma sessão para persistir cookies
-    session = requests.Session()
 
     # Cabeçalhos para simular um navegador
     headers = {
@@ -20,16 +18,16 @@ def html_visioncine():
         'Referer': 'https://visioncine-1.com.br',  # Adicionando um cabeçalho de Referer
     }
 
-    # Tentando pegar o conteúdo da página
     try:
-        # Requisição com a sessão
-        response = session.get(url, headers=headers, timeout=10)
-        response.raise_for_status()  # Levanta erro se a resposta não for 200
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers) as response:
+                if response.status == 200:
+                    html_content = await response.text()
+                    return Response(html_content, mimetype='text/html')
+                else:
+                    return f"Erro ao acessar o site. Status code: {response.status}"
 
-        # Retornar o conteúdo HTML da página
-        return Response(response.text, mimetype='text/html')
-
-    except requests.exceptions.RequestException as e:
+    except Exception as e:
         return f"Erro ao acessar o site: {e}"
 
 if __name__ == '__main__':
