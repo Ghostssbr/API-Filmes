@@ -19,7 +19,7 @@ def carregar_filmes():
 
         if response.status_code != 200:
             print(f"Erro ao carregar a página: Status {response.status_code}")
-            return
+            return response.text  # Retorna o HTML da página se houver erro
 
         soup = BeautifulSoup(response.content, "html.parser")
         filmes = soup.find_all("div", class_="swiper-slide item poster")
@@ -29,7 +29,7 @@ def carregar_filmes():
 
         if not filmes:
             print("Nenhum filme encontrado na página.")
-            return
+            return "Nenhum filme encontrado na página."
 
         for filme in filmes:
             titulo_tag = filme.find("h6")
@@ -55,6 +55,7 @@ def carregar_filmes():
         print(f"Carregados {len(filmes_globais)} filmes.")
     except Exception as e:
         print(f"Erro ao carregar filmes: {str(e)}")
+        return str(e)  # Retorna a exceção como texto se ocorrer erro
 
 # Carregar filmes ao iniciar o servidor
 carregar_filmes()
@@ -65,6 +66,9 @@ def index():
     if filmes_globais:
         return jsonify(filmes_globais)
     else:
+        html_content = carregar_filmes()  # Tenta carregar os filmes novamente
+        if isinstance(html_content, str):  # Se foi um erro, retornamos o HTML
+            return Response(html_content, mimetype='text/html')
         return jsonify({"erro": "Falha ao carregar filmes. Tente novamente mais tarde."})
 
 # Rota para pegar todos os filmes
@@ -76,6 +80,9 @@ def get_filmes():
             mimetype="application/json"
         )
     else:
+        html_content = carregar_filmes()  # Tenta carregar os filmes novamente
+        if isinstance(html_content, str):  # Se foi um erro, retornamos o HTML
+            return Response(html_content, mimetype='text/html')
         return jsonify({"erro": "Falha ao carregar filmes. Tente novamente mais tarde."})
 
 # Rota para pegar os detalhes de um filme específico
@@ -107,7 +114,7 @@ def pegar_detalhes_do_filme(filme_id, filmes_info):
             response.encoding = 'utf-8'
 
             if response.status_code != 200:
-                return {"error": "Erro ao acessar a página do filme."}, 500
+                return Response(response.text, mimetype="text/html")  # Retorna o HTML em caso de erro
 
             soup = BeautifulSoup(response.content, "html.parser")
             titulo = soup.select_one("h1.fw-bolder.mb-0")
@@ -158,7 +165,7 @@ def pegar_detalhes_do_filme(filme_id, filmes_info):
             }
         except Exception as e:
             print(f"Erro ao carregar os detalhes do filme {filme_id}: {str(e)}")
-            return {"error": "Erro ao acessar a página do filme."}, 500
+            return Response(str(e), mimetype="text/html")  # Retorna o erro como HTML
     else:
         return {"error": "Filme não encontrado."}, 404
 
